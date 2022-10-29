@@ -40,7 +40,7 @@ def posFixedConvert(expression):
         elif operator == '+':
             pOperator = 2
         elif operator == '.':
-            pOperator = 1
+            pOperator = 5
         else: 
             pOperator = 1
 
@@ -49,7 +49,7 @@ def posFixedConvert(expression):
         elif top == '+':
             pTop = 2
         elif top == '.':
-            pTop = 1
+            pTop = 5
         else: 
             pTop = 1
 
@@ -133,6 +133,6 @@ def addConcatenation(expression, alf):
         else:
             result.append(expression[i])
     
-    print("\033[92m" + str(''.join(result)) + '\033[0m')
+    print("\033[92m" + "[addConcatenacao] " + str(''.join(result)) + '\033[0m')
 
     return result

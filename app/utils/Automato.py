@@ -9,22 +9,33 @@ class Automato:
     def getAlphabet(self, alphabet):
         self.alphabet = alphabet
     
-    def addState(self):
+    def addState(self, number):
         def createState(a, b):
             self.states.append(a)
             self.states.append(b)
 
-        if len(self.states) == 0:
-            createState(1, 2)
+        if len(self.states) == 0 and number == 0:
+            createState(0, 1)
             return [1, 2]
         else:
-            last = self.states[len(self.states)-1]
-            createState(last + 1, last + 2)
-            return [last + 1, last + 2]
+            createState(number, number+1)
     
+    def concatenarStates(self, states):
+        for state in states:
+            if not state in self.states:
+                self.states.append(state)
+
     def addTransition(self, Transition):
         self.transition.append(Transition)
     
+    def concatenarTransitions(self, transitionsA, transitionsB):
+        if transitionsB:
+            newTransitions = self.transition + transitionsA + transitionsB
+        else:
+            newTransitions = self.transition + transitionsA 
+        
+        self.transition = newTransitions
+
     def getLastState(self):
         return self.states[len(self.states)-1]
 
@@ -35,13 +46,7 @@ class Automato:
         self.finals.append(final)
 
     def removeFinal(self):
-        if len(self.finals) > 1:
-            final2 = self.finals.pop()
-            final1 = self.finals.pop()
-            return [final1, final2]
-        
-        return self.finals.pop(0)
-
+        return self.finals.pop() 
     
     def removeTransition(self, transition):
         for i in self.transition:

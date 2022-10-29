@@ -1,3 +1,4 @@
+from distutils import extension
 from enum import auto
 from multiprocessing import context
 from typing import final
@@ -36,30 +37,12 @@ def expression(request):
             expressionCon = expression
 
         posFixExpression = posFixedConvert(expressionCon)
+        afn = createAFN(posFixExpression, alf)
         expression = ''.join(expression)
-
-
-        # ! CODIGO COM PROBLEMA NO OPERADOR DE CONCATENAÇÂO
-        # Inicia o automato
-        #automato = createAFN(expression, alf)
-        
         context = {
             "expression": expression,
-            "posfix": posFixExpression
+            "posfix": posFixExpression,
+            "AFN": afn
         }
-
-        """ print("\033[93m" + 
-            "Alfabeto: " + str(automato.alphabet) +
-            "\nInicial: " + str(automato.initial) +
-            "\nFinal: " + str(automato.finals))
-        
-        for i in range(len(automato.transition)):
-            print("Transições: (" + str(automato.transition[i].state) + 
-            ", " + str(automato.transition[i].symbol) +
-            ", " + str(automato.transition[i].transition) + ")")
-        
-        print("\033[0m") """
-
-
 
     return render(request, 'home.html', context)
