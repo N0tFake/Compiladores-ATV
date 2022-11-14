@@ -1,3 +1,6 @@
+from app.utils.Transition import Transition
+
+
 class Automato:
     def __init__(self):
         self.alphabet = []
@@ -9,12 +12,14 @@ class Automato:
     def getAlphabet(self, alphabet):
         self.alphabet = alphabet
     
-    def addState(self, number):
+    def addState(self, number, oneState=None):
         def createState(a, b):
             self.states.append(a)
             self.states.append(b)
 
-        if len(self.states) == 0 and number == 0:
+        if oneState:
+            self.states.append(number+1)
+        elif len(self.states) == 0 and number == 0:
             createState(0, 1)
             return [1, 2]
         else:
@@ -52,3 +57,6 @@ class Automato:
         for i in self.transition:
             if i == transition:
                 self.transition.remove(transition)
+    
+    def odernar(self):
+        self.transition = sorted(self.transition, key=lambda x: x.state)

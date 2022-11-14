@@ -26,9 +26,21 @@ def operatorConcatenation(afn1, afn2):
     """
     automato.updateInitial(afn1.initial)
     automato.addFinail(afn2.finals[0])
-    TransitionConcatenation = Transition(afn1.finals[0], None, afn2.initial)
+
+    for transition in afn1.transition:
+        automato.addTransition(Transition(transition.state, transition.symbol, transition.transition))
+
+    TransitionConcatenation = Transition(afn1.finals[0], None, afn1.finals[0]+1)
     automato.addTransition(TransitionConcatenation)
-    automato.concatenarTransitions(afn1.transition, afn2.transition)
+
+    for transition in afn2.transition:
+        if transition.state == afn2.initial:
+            NewTransition = Transition(afn1.finals[0]+1, transition.symbol, transition.transition)
+            print(NewTransition.state)
+            automato.addTransition(NewTransition)
+        else:
+            automato.addTransition(transition)
+
 
     return automato
 
@@ -106,54 +118,11 @@ def operatorKleene(afn):
         
         automato.addTransition(NewTransition)
 
+    automato.odernar()
+
     print('\033[0m')
     return automato
     
-
-""" 
-oAFN = Automato gerado pelo algoritmo de Thompson
-Primeiramente cria um novo automato, chamaremos aqui de nAFN:
-- o estado inicial do nAFN irá ser 0;
-- No oAFN;
-	- Verificar se o estado atual do oAFN tem mais de uma transição;
-	- Renomear as transições de acordo com a contagem anterior;
-	- Salvar as transições renomeadas no nAFN
-- Algomerar as transisões com simbolos repetidos mas com P diferentes;
-
-
-Transições que contem P para mais de um estado:
-Fazer uma transição para cada P, com o mesmo simbolo e o mesmo estado
-
-ler o estado da transição
-nova transição:
-renomear ele de acordo com a contagem
-capturar seu simbolo e salvar na nova transição
-capturar o P e salvar em outra variavel e renomear na nova transição de acordo com a contagem
-
-Apartir do P capturado repetir o processo anterior
-
-Se P capturado não conter nenhuma transição, ele é final
-"""
-
-def renameStates(afn):
-    automato = Automato()
-    """ automato.updateInitial(0)
-    
-    transitionInitial = None
-    for transition in afn.transition:
-        if transition.state == afn.initial:
-            transitionInitial = transition.transition 
-            break 
-    
-    transitions = [{str(afn.initil): True, 'transicao': transitionInitial}] """    
-
-"""     for i in range(len(transitionsOrder)):
-        print("Transições: (" + str(transitionsOrder[i].state) + 
-        ", " + str(transitionsOrder[i].symbol) +
-        ", " + str(transitionsOrder[i].transition) + ")")
- """
-
-
 def createAFN(expression, alf):
     # Inicia o Automato
     afn = []
@@ -205,9 +174,5 @@ def createAFN(expression, alf):
         ", " + str(afn[0].transition[i].transition) + ")")
     
     print("\033[0m")
-
-    print('\033[94m')
-    renameStates(afn[0])
-    print('\033[0m')
 
     return afn[0]
