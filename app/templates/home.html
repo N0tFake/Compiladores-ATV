@@ -11,6 +11,7 @@
 </head>
 <body>
     <div class="container-body">
+        <h1>Compiladores - UFT</h1>
         <div class="container-main" >
             <form method="get" action="{% url 'expression' %}">
                 <input type="text" name="input">
@@ -38,9 +39,9 @@
             {% if inputEmpty %}
                 <h2>A expressão não pode ser vazia</h2>
             {% endif %}
-
+        </div>
+        <div class="container-result">
             {% include 'parts/tableAFN.html' %}
-    
         </div>
     </div>
 

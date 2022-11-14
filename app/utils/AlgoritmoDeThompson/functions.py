@@ -2,22 +2,6 @@ from enum import auto
 from app.utils.Automato import Automato
 from app.utils.Transition import Transition
 
-# oLer um simbolo e o seu proximo 
-# -> Caso o prox seja uma letra do alfabeto ler o prox 
-# indentificar o operando do prox
-# se for +, fazer A+B
-# se ., fazer A.B
-# -> Caso o prox seja um operando
-# se for um *, fazer sua estrutura
-# 
-# Na proxima interação se o simbolo lido for uma letra e seu proximo tb for, ou um *
-# Criar novo automato
-# Fazer até acha a mesma condição
-# 
-# Se tiver 2 ou mais automatos, e o simbolo lido for um . ou +
-# Juntar o ultimo automato com o ultimo-1, fazendo a operação lidas
-#
-
 def startAutomato(alf, end, symbol):
     automato = Automato()
     automato.getAlphabet(alf)
@@ -36,10 +20,10 @@ def operatorConcatenation(afn1, afn2):
 
     automato.concatenarStates(afn1.states)
     automato.concatenarStates(afn2.states)
-    
-    numStatesAfn1 = afn1.getLastState()
+    """ numStatesAfn1 = afn1.getLastState()
     numStatesAfn2 = afn2.getLastState()
     automato.addState((numStatesAfn1 + 1) if numStatesAfn1 > numStatesAfn2 else (numStatesAfn2 + 1))
+    """
     automato.updateInitial(afn1.initial)
     automato.addFinail(afn2.finals[0])
     TransitionConcatenation = Transition(afn1.finals[0], None, afn2.initial)
@@ -49,7 +33,7 @@ def operatorConcatenation(afn1, afn2):
     return automato
 
 def operatorOr(afn1, afn2):
-    print('\033[90m')
+    print('\033[90m Operador OR')
     finals = [afn1.removeFinal(), afn2.removeFinal()]
     automato = Automato()
 
@@ -60,26 +44,35 @@ def operatorOr(afn1, afn2):
     numStates = afn2.getLastState()
     automato.addState(numStates + 1)
 
-    print('finals: ', finals)
-    print('numStates: ', numStates)
+    automato.updateInitial(0)
+    TransitionInitial = Transition(0, None, {afn1.initial + 1, afn2.initial + 1})
+    automato.addTransition(TransitionInitial)
 
-    automato.updateInitial(numStates+1)
-    TransitionInitial1 = Transition(numStates+1, None, afn1.initial)
-    TransitionInitial2 = Transition(numStates+1, None, afn2.initial)
-    automato.addTransition(TransitionInitial1)
-    automato.addTransition(TransitionInitial2)
-
-    automato.concatenarTransitions(afn1.transition, afn2.transition)
+     # ADD transitions
+    afns = [afn1, afn2]
+    for afn in afns:
+        for transition in afn.transition:
+            state = transition.state + 1
+            symbol = transition.symbol
+            Ptransition = transition.transition
+            if type(Ptransition) == int:
+                NewTransition = Transition(state, symbol, Ptransition + 1)
+            else:
+                NewTransition = Transition(state, symbol, {Ptransition[0]+1, Ptransition[1]+1})
+            
+            automato.addTransition(NewTransition)
+        
 
     automato.addFinail(numStates+2)
-    TransitionFinal1 = Transition(finals[0], None, numStates+2)
-    TransitionFinal2 = Transition(finals[1], None, numStates+2)
+    TransitionFinal1 = Transition(finals[0]+1, None, numStates+2)
+    TransitionFinal2 = Transition(finals[1]+1, None, numStates+2)
     automato.addTransition(TransitionFinal1)
     automato.addTransition(TransitionFinal2)
     print('\033[0m')
     return automato
 
 def operatorKleene(afn):
+    print('\033[90m Fecho de Kleene')
     final = afn.removeFinal()
     automato = Automato()
     automato.getAlphabet(afn.alphabet)
@@ -88,19 +81,78 @@ def operatorKleene(afn):
     automato.concatenarStates(afn.states)
     automato.addState(len(afn.states))
 
-    automato.updateInitial(newState+1)
+    automato.updateInitial(0)
     automato.addFinail(newState+2)
-    TransitionInitialForExInitial = Transition(automato.initial, None, afn.initial)
-    TransitionExFinalForFinal =  Transition(final, None, automato.finals[0])
-    TransitionInitialForFinal = Transition(automato.initial, None, automato.finals[0])
-    TransitionFinalForExInitial = Transition(automato.finals[0], None, afn.initial)
-    automato.addTransition(TransitionInitialForFinal)
+    
+    TransitionNewInitial = Transition(automato.initial, None, {afn.initial+1, automato.finals[0]})
+    TransitionExFinalForFinal =  Transition(final+1, None, automato.finals[0])
+    TransitionFinalForExInitial = Transition(automato.finals[0], None, afn.initial+1)
+    automato.addTransition(TransitionNewInitial)
     automato.addTransition(TransitionFinalForExInitial)
-    automato.addTransition(TransitionInitialForExInitial)
     automato.addTransition(TransitionExFinalForFinal)
-    automato.concatenarTransitions(transitionsA=afn.transition, transitionsB=None)
 
+    for transition in afn.transition:
+        state = transition.state + 1
+        symbol = transition.symbol
+        Ptransition = transition.transition
+        if type(Ptransition) == int:
+            NewTransition = Transition(state, symbol, Ptransition + 1)
+        else:
+            _ptransition = []
+            for P in Ptransition:    
+                _ptransition.append(P+1)
+            
+            NewTransition = Transition(state, symbol, {_ptransition[0], _ptransition[1]})
+        
+        automato.addTransition(NewTransition)
+
+    print('\033[0m')
     return automato
+    
+
+""" 
+oAFN = Automato gerado pelo algoritmo de Thompson
+Primeiramente cria um novo automato, chamaremos aqui de nAFN:
+- o estado inicial do nAFN irá ser 0;
+- No oAFN;
+	- Verificar se o estado atual do oAFN tem mais de uma transição;
+	- Renomear as transições de acordo com a contagem anterior;
+	- Salvar as transições renomeadas no nAFN
+- Algomerar as transisões com simbolos repetidos mas com P diferentes;
+
+
+Transições que contem P para mais de um estado:
+Fazer uma transição para cada P, com o mesmo simbolo e o mesmo estado
+
+ler o estado da transição
+nova transição:
+renomear ele de acordo com a contagem
+capturar seu simbolo e salvar na nova transição
+capturar o P e salvar em outra variavel e renomear na nova transição de acordo com a contagem
+
+Apartir do P capturado repetir o processo anterior
+
+Se P capturado não conter nenhuma transição, ele é final
+"""
+
+def renameStates(afn):
+    automato = Automato()
+    """ automato.updateInitial(0)
+    
+    transitionInitial = None
+    for transition in afn.transition:
+        if transition.state == afn.initial:
+            transitionInitial = transition.transition 
+            break 
+    
+    transitions = [{str(afn.initil): True, 'transicao': transitionInitial}] """    
+
+"""     for i in range(len(transitionsOrder)):
+        print("Transições: (" + str(transitionsOrder[i].state) + 
+        ", " + str(transitionsOrder[i].symbol) +
+        ", " + str(transitionsOrder[i].transition) + ")")
+ """
+
 
 def createAFN(expression, alf):
     # Inicia o Automato
@@ -115,41 +167,24 @@ def createAFN(expression, alf):
         current = expression[cont]
         lastAfn = len(afn)-1
 
-        if current in alf: # Se proximo(next) é um simbolo do alfabeto
+        if current in alf: # Se atual(current) é um simbolo do alfabeto
             print(f'\033[91m [Alfanumerioco ({current})] ' + str(afn) + '\033[0m')
             afn.append(startAutomato(alf, numStates, current))
-            numStates += 2
-            #next = expression[cont]            
+            numStates += 2     
         else:
-            if current == '+': # Se o proximo(next) é um operador OR
+            if current == '+': # Se o atual(current) é um operador OR
                 print('\033[91m [Operador +] ' + str(afn) + '\033[0m')
                 afn[lastAfn-1] = operatorOr(afn[lastAfn-1], afn[lastAfn])
                 numStates += 2
                 afn.pop()
             
-            elif current == '.': # Se proximo(next) é um operador de concatenação
-
-                print("\033[91m" + 
-                    "Tamnho da lista de afn: " + str(len(afn)) +
-                    "\nAlfabeto: " + str(afn[lastAfn].alphabet) +
-                    "\nInicial: " + str(afn[lastAfn].initial) +
-                    "\nFinal: " + str(afn[lastAfn].finals) +
-                    "\nStates: " + str(afn[lastAfn].states) 
-                ) 
-
-                for i in range(len(afn[lastAfn].transition)):
-                    print("Transições: (" + str(afn[lastAfn].transition[i].state) + 
-                    ", " + str(afn[lastAfn].transition[i].symbol) +
-                    ", " + str(afn[lastAfn].transition[i].transition) + ")")
-
-                print("\033[0m")
-
+            elif current == '.': # Se atual(current) é um operador de concatenação
                 print('\033[91m [Operador .] ' + str(afn) + '\033[0m')
                 afn[lastAfn-1] = operatorConcatenation(afn1=afn[lastAfn-1], afn2=afn[lastAfn])
                 afn.pop()
                 ...
                 
-            elif current == '*':  # Se proximo(next) é um fecho de Kleene
+            elif current == '*':  # Se atual(current) é um fecho de Kleene
                 print('\033[91m [Operador *] ' + str(afn) + '\033[0m')
                 afn[lastAfn] = operatorKleene(afn[lastAfn])
                 numStates += 2
@@ -170,5 +205,9 @@ def createAFN(expression, alf):
         ", " + str(afn[0].transition[i].transition) + ")")
     
     print("\033[0m")
+
+    print('\033[94m')
+    renameStates(afn[0])
+    print('\033[0m')
 
     return afn[0]

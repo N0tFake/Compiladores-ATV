@@ -8,6 +8,7 @@ from app.utils.Automato import Automato
 from app.utils.ConvertorPosFixed.functions import addConcatenation, checkExpression, getAlf, posFixedConvert
 from app.utils.Stack import Stack
 from app.utils.Transition import Transition
+from app.utils.plot.functions import plotAutomato
 
 # Create your views here.
 def home(request):
@@ -37,8 +38,14 @@ def expression(request):
             expressionCon = expression
 
         posFixExpression = posFixedConvert(expressionCon)
+
+        # Criação do Automato Finito não deterministico, usando o algoritmo de Thompson
         afn = createAFN(posFixExpression, alf)
+
+        #plotAutomato(afn)
+
         expression = ''.join(expression)
+        
         context = {
             "expression": expression,
             "posfix": posFixExpression,
