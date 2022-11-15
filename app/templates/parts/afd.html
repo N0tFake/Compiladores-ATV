@@ -1,0 +1,29 @@
+{% load static %}
+
+{% if AFN %}
+
+<div class="container-afd">
+    <h2>AFD - Autômato finito determinístico</h2>
+    <div class="container-fechoE">
+        {% for fecho in fechoE %}
+            <span>Fecho-&epsilon;(q{{fecho.fecho}}) = {
+            
+            {% if fecho.transitions|length > 0 %}
+
+                {% for transition in fecho.transitions %}
+                    q{{transition}}
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}  
+                {% endfor %}
+            {% else %}
+                q{{fecho.transitions}}
+            {% endif %}
+            }</span>
+        {% endfor %}
+    </div>
+
+    <div class="table-afd"></div>
+</div>
+
+{% endif %}

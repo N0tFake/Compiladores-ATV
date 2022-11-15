@@ -1,0 +1,63 @@
+{% if AFN %}
+
+<h2>AFN - Autômato finito com movimento vazio</h2>
+<span>Inicial: {{AFN.initial}}</span>
+<span>Final: {{AFN.finals.0}}</span>
+
+<div class="table-afn">
+    <div class="table-afn-columns table-title">
+        <span id="empty"></span>
+        {% for alf in AFN.alphabet %}
+        <span class="table-symbols">{{alf}}</span>
+        {% endfor %}
+        <span class="table-symbols">&epsilon;</span>
+    </div>
+    <div>
+        {% for transition in AFN.transition %}
+        <div class="table-afn-columns">
+            <span class="table-state">
+                {% if transition.state == AFN.initial %}
+                    &triangleright;
+                {% endif %}
+                q{{transition.state}}
+            </span>
+            {% for symbol in AFN.alphabet %}
+                <span class="table-transitions">
+
+                {% if transition.symbol == symbol %}
+                    q{{transition.transition}}    
+                {% else %}
+                    
+                {% endif %}
+                </span>
+            {% endfor %}
+            {% if transition.symbol == None %}
+            <span class="table-transitions">    
+                {% if transition.transition|length > 1 %}
+                    {
+                    {% for transition in transition.transition %}
+                        q{{transition}}
+                        {% if forloop.first %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                    }
+                {% else %}
+                   q{{transition.transition}}
+                {% endif %}
+            </span>
+            {% else %}
+                <span class="table-transitions"></span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="table-afn-columns">
+            <span class="table-state ">* q{{AFN.finals.0}}</span>
+            {% for i in AFN.alphabet %}
+            <span class="table-transitions"></span>
+            {% endfor %}
+            <span class="table-transitions"></span>
+        </div>
+    </div>
+</div>
+{% endif %}
