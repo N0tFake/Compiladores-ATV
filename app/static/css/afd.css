@@ -1,0 +1,15 @@
+.container-afd {
+    width: 70%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.container-fechoE {
+    width: 300px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+}

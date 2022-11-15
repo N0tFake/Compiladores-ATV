@@ -20,10 +20,6 @@ def operatorConcatenation(afn1, afn2):
 
     automato.concatenarStates(afn1.states)
     automato.concatenarStates(afn2.states)
-    """ numStatesAfn1 = afn1.getLastState()
-    numStatesAfn2 = afn2.getLastState()
-    automato.addState((numStatesAfn1 + 1) if numStatesAfn1 > numStatesAfn2 else (numStatesAfn2 + 1))
-    """
     automato.updateInitial(afn1.initial)
     automato.addFinail(afn2.finals[0])
 
@@ -97,11 +93,9 @@ def operatorKleene(afn):
     automato.addFinail(newState+2)
     
     TransitionNewInitial = Transition(automato.initial, None, {afn.initial+1, automato.finals[0]})
-    TransitionExFinalForFinal =  Transition(final+1, None, automato.finals[0])
-    TransitionFinalForExInitial = Transition(automato.finals[0], None, afn.initial+1)
+    TransitionExFinalForFinalAndExInitial =  Transition(final+1, None, {automato.finals[0], afn.initial+1})
     automato.addTransition(TransitionNewInitial)
-    automato.addTransition(TransitionFinalForExInitial)
-    automato.addTransition(TransitionExFinalForFinal)
+    automato.addTransition(TransitionExFinalForFinalAndExInitial)
 
     for transition in afn.transition:
         state = transition.state + 1

@@ -16,6 +16,21 @@ def fechoE(currentState, transitions):
             
     return output
 
+def getStates(afn, current, symbol):
+    output = []
+    for transition in afn.transition:
+        if transition.state == current:
+            if transition.symbol == None or transition.symbol == symbol:
+                if type(transition.transition) == int:
+                    next = transition.transition
+                    output = list(set(output) | set(getStates(afn, next, symbol)))
+                else:
+                    for t in transition.transition:
+                        next = t
+                        output = list(set(output) | set(getStates(afn, next, symbol)))
+    return sorted(output)
+
+
 def convertAFD(afn):
     print('\033[90mConvertAFD ---------------------------------------------------------------------->')
     
@@ -35,4 +50,4 @@ def convertAFD(afn):
     print('Fechos: \n', fechoE_list)
     print('\033[0m')
 
-    return "Em produção"
+    return [fechoE_list, 'em produção']

@@ -44,7 +44,9 @@ def expression(request):
         afn = createAFN(posFixExpression, alf)
 
         # Converter o AFN para AFN
-        afd = convertAFD(afn)
+        aux = convertAFD(afn)
+        fechoE_list = aux[0]
+        afd = aux[1]
 
         #plotAutomato(afn)
 
@@ -54,7 +56,8 @@ def expression(request):
             "expression": expression,
             "posfix": posFixExpression,
             "AFN": afn,
-            "AFD": afd
+            'fechoE': fechoE_list,
+            "AFD": afd,
         }
 
     return render(request, 'home.html', context)
